@@ -31,7 +31,7 @@ const InterviewCard = ({interviewId,userId,role,type,techstack,createdAt}: Inter
                     </div>
                 </div>
                 <p className='line-clamp-2 mt-5 '>
-                    {feedback?.finalAssessment || "You haven't takend the interview yet. Take it now to improve your skills."}
+                    {feedback?.finalAssessment || "You haven't taken the interview yet. Take it now to improve your skills."}
                 </p>
             </div>
             <div className='flex flex-row justify-between'>
