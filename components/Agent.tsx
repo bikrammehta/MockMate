@@ -70,7 +70,7 @@ const Agent = ({userName,userId,type,interviewId,questions}: AgentProps) => {
         if(success && id){
             router.push(`/interview/${interviewId}/feedback`)
         }else{
-            console.log('teri mkc');
+            console.log('kuch gadbad hai');
             router.push('/');
             // router.push(`/interview/${interviewId}/feedback`)
         }

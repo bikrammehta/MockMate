@@ -39,45 +39,73 @@ const AuthForm = ({type} : {type:FormType}) => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try{
-      if(type=== 'sign-up'){
-        const {name,email,password}=values;
-        const userCredentials=await createUserWithEmailAndPassword(auth,email,password);
-        const result=await signUp({
-          uid : userCredentials.user.uid,
-          name:name!,
-          email,
-          password,
-        })
+  try {
+    if (type === "sign-up") {
+      // --- Sign Up Flow ---
+      const { name, email, password } = values;
 
-        if(!result?.success){
-          toast.error(result?.message);
-          return;
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-        }
-        toast.success('Account created successfully. Please sign in.')
-        router.push('/sign-in')
-      }else{
+      const result = await signUp({
+        uid: userCredentials.user.uid,
+        name: name!,
+        email,
+        password,
+      });
 
-        const {email,password}=values;
-        const userCredentials=await signInWithEmailAndPassword(auth,email,password);
-        const idToken=await userCredentials.user.getIdToken();
-        if(!idToken){
-          toast.error('Sign in failed');
-          return;
-        }
-        await signIn({
-          email,idToken
-        })
-        toast.success('Sign in successfully')
-        router.push('/')
+      if (!result?.success) {
+        toast.error(result?.message);
+        return;
       }
 
-    }catch(error){
-      console.log(error);
-      toast.error(`There was an error : ${error}`)
+      toast.success("Account created successfully. Please sign in.");
+      router.push("/sign-in");
+
+    } else {
+      // --- Sign In Flow ---
+      const { email, password } = values;
+
+      try {
+        const userCredentials = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        const idToken = await userCredentials.user.getIdToken();
+        if (!idToken) {
+          toast.error("Please sign up first.");
+          router.push("/sign-up");
+          return;
+        }
+
+        await signIn({ email, idToken });
+
+        toast.success("Signed in successfully");
+        router.push("/");
+      } catch (error: any) {
+        if (error.code === "auth/user-not-found") {
+          toast.error("Please sign up first.");
+          router.push("/sign-up");
+        } else if (error.code === "auth/invalid-credential") {
+          toast.error("Wrong Email or password, try again.");
+        } else {
+          // fallback for any other Firebase errors
+          toast.error("Please sign up first.");
+          router.push("/sign-up");
+        }
+      }
     }
+  } catch {
+    toast.error("Please sign up first.");
+    router.push("/sign-up");
   }
+}
+
 
   const isSignIn =type === 'sign-in';
 
